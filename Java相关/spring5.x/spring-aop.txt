@@ -1,0 +1,31 @@
+@EnableAspectJAutoProxy	-> proxyTargetClass=true 指定强制使用cglib代理
+1、会导入一个Registrar，@Import(AspectJAutoProxyRegistrar.class) 
+2、注册Creator的Bean定义到容器，AnnotationAwareAspectJAutoProxyCreator
+		Creator实际是个BeanPostProcessor
+3、收集增强器集合
+4、实例化目标bean
+5、调用初始化后置拦截方法，生成目标类的代理类
+		proxy-target-class=true，使用cglib
+		没有实现接口，使用cglib
+		接口或代理类，使用jdk动态代理
+		其他使用jdk动态代理
+		
+-------------------------------------------------
+@Aspect		-> 需要导入aspectjweaver.jar包
+@Pointcut、@Before、@After、@AfterReturning、@AfterThrowing、@Around
+正常执行顺序：@Around(before) -> @Before -> @Around(after) -> @After -> @AfterReturning
+异常执行顺序：@Around(before) -> @Before -> @After -> @AfterThrowing
+
+-------------------------------------------------
+expose-proxy = true
+同一个实例中两个方法依赖调用，A调用B，A方法是被增强的，但B不会，this代表真实对象，
+所以会导致切面对B的拦截失效，如果要使B的拦截生效，两种方法：
+1、AopContext.currentProxy() 替换 this
+2、注入当前实例，使用实例调用嵌套方法
+
+-------------------------------------------------
+JDK：基于接口实现，本身继承了Proxy
+Cglib：基于类继承实现
+
+-------------------------------------------------
+

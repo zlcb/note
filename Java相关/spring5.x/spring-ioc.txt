@@ -1,0 +1,41 @@
+new AnnotationConfigApplicationContext(config)
+
+this()
+	GenericApplicationContext -> new DefaultListableBeanFactory()
+	new AnnocationBeanDefinitionReader(this);
+		new ConfiguraitonClassPostProcessor()  -> BeanFactoryPostProcessor
+		new AutowiredAnnotationBeanPostProcessor()		-> BeanPostProcessor	->	@Autowired
+		new RequiredAnnotationBeanPostProcessor()		-> BeanPostProcessor	->	@Required
+		new CommonAnnotationBeanPostProcessor()		-> BeanPostProcessor	->	@Resource
+		
+	new ClassPathBeanDefinitionScanner(this);
+register(config);	-> 生成配置类的定义，并注册到容器
+	
+refresh();
+1、准备更新上下文 
+	1、记录容器开始启动的时间
+	2、close=false，active=true
+2、获取BeanFctory
+3、填充BeanFactory
+	1、主要是创建了一个ApplicationContextAwareProcessor -> BeanPostProcessor
+	2、生成Evn，systemProperties
+4、执行所有的BeanFactoryPostProcesor 的postProcessBeanFactory方法
+	1、ConfigurationClassPostProcessor
+		1、找到@Configuration的类解析 -》 ConfigurationClassParser
+		2、找@ComponentScan -> @Component
+		3、找@Import
+		4、生成类定义并注册到容器
+5、找到所有实现了BeanPostProcessor接口的类，生成实例（注意不是定义，getBean），
+		然后排序，注册到容器
+6、实例化Bean
+	getBean -> doGetBean -> getSingleton -> createBean -> doCreateBean 
+	1、doCreateBean
+		1、创建实例出来 -> 放入单例工厂缓存
+		2、属性注入 -> 这里有个循环依赖的问题要解决
+		3、调用初始化方法
+			1、执行所有BeanPostProcessor的前置拦截方法 postProcessBeforeInitialization
+			2、如果实现InitializingBean的话，执行afterPropertesSet方法
+			3、执行所有BeanPostProcessor的后置拦截方法 postProcessAfterInitialization 
+	2、getSingleton中将实例放入单例缓存池，从单例工厂缓存删除
+			
+
